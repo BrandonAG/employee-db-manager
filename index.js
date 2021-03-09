@@ -1,25 +1,9 @@
 const connection = require('./config/connection');
 const inquirer = require('inquirer');
-const cTable = require('console.table');
 const [toDoQuestions] = require('./src/questions');
 const [viewAllEmployees, addEmployee] = require('./lib/employee');
 const [viewAllDepartments, addDepartment] = require('./lib/department');
 const [viewAllRoles, addRole] = require('./lib/role');
-
-// connection.connect(err => {
-//   if (err) throw err;
-//   console.log('connected as id ' + connection.threadId);
-//   afterConnection();
-// });
-
-// afterConnection = () => {
-//   connection.query('SELECT * FROM department', function(err, res) {
-//     if (err) throw err;
-//     // console.log(res);
-//     console.table(res);
-//     connection.end();
-//   });
-// };
 
 var employeesList;
 var departmentsList;
@@ -57,9 +41,59 @@ const askQuestions = async () => {
                 else if (answers["to-do"] === "viewAllRoles") {
                     return await viewAllRoles();
                 }
-                // else if (answers["to-do"] === "addEmployees") {
-                //     continue;
-                // }
+                else if (answers["to-do"] === "addEmployees") {
+                    let rolNameVal = []
+                    for (var i = 0; i <rolesList.length; i++) {
+                        rolNameVal.push({
+                            name: rolesList[i].title,
+                            value: rolesList[i].id
+                        })
+                    }
+                    let empNameVal = []
+                    for (var i = 0; i <employeesList.length; i++) {
+                        empNameVal.push({
+                            name: employeesList[i].first_name + " " + employeesList[i].first_name,
+                            value: employeesList[i].id
+                        })
+                    }
+                    empNameVal.unshift({
+                        name: "None",
+                        value: null
+                    })
+                    await inquirer.prompt(
+                        [
+                            {
+                                type: 'input',
+                                name: 'first-name',
+                                message: "Employees First Name?",
+                            },
+                            {
+                                type: 'input',
+                                name: 'last-name',
+                                message: "Employees Last Name?",
+                            },
+                            {
+                                type: 'list',
+                                name: 'role-id',
+                                message: "Employees Title?",
+                                choices: rolNameVal,
+                            },
+                            {
+                                type: 'list',
+                                name: 'manager-id',
+                                message: "Employees Title?",
+                                choices: empNameVal,
+                            },
+                        ]
+                    )
+                    .then(async answers => {
+                        console.log(answers);
+                        return await addEmployee(answers['first-name'], answers['last-name'], answers['role-id'], answers['manager-id'])
+                        .then(() => {
+                            updateLists()
+                        });
+                    })
+                }
                 if (answers["to-do"] === "addDepartment") {
                     await inquirer.prompt(
                         [
@@ -72,7 +106,10 @@ const askQuestions = async () => {
                     )
                     .then(async answers => {
                         console.log(answers);
-                        return await addDepartment(answers['department-name']);
+                        return await addDepartment(answers['department-name'])
+                        .then(() => {
+                            updateLists()
+                        });
                     })
                 }
                 else if (answers["to-do"] === "addRole") {
@@ -105,7 +142,10 @@ const askQuestions = async () => {
                     )
                     .then(async answers => {
                         console.log(answers);
-                        return await addRole(answers['role-title'], answers['role-salary'], answers['department-id']);
+                        return await addRole(answers['role-title'], answers['role-salary'], answers['department-id'])
+                        .then(() => {
+                            updateLists()
+                        });
                     })
                 }
                 // console.log(answers);
@@ -113,17 +153,5 @@ const askQuestions = async () => {
         }
     });
 }
-
-// const questionsAddDep = async () => {
-
-// }
-
-// const questionsAddRole = async () => {
-    
-// }
-
-// const questionsAddEmployee = async () => {
-    
-// }
 
 askQuestions();
