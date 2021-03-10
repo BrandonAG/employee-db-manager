@@ -21,7 +21,16 @@ First, install `Node.js 14` and `MySQL 8` or newer on your system. Then clone th
 
 ## Usage
 
-From the root directory of the local repository use your CLI to start the application with the below commands:
+From the root directory of the local repository use your CLI to initialize the MySQL database. Run the following commands in your CLI to create the database and tables. The `seed.sql` file is optional, and will pre-polulate the tables with a handful of dummy entries.
+
+```
+mysql -u your_username -p
+SOURCE ./config/schema.sql
+SOURCE ./config/seed.sql
+quit
+```
+
+Then start the application with the below commands:
 
 ```
 npm start
@@ -35,7 +44,7 @@ node index.js
 
 Follow the prompts in your CLI to read, write, and update the employee database.
 
-[Example Usage]()
+[Example Usage](https://drive.google.com/file/d/1daWdbS69TBKl4-ZcNoc7MhqpOD76xKm8/view)
 
 ## Questions
 

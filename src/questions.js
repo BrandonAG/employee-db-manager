@@ -18,7 +18,7 @@ const toDoQuestions = [
             },
             {
                 name: "Add Employee",
-                value: "addEmployees",
+                value: "addEmployee",
             },
             {
                 name: "Add Department",
@@ -27,6 +27,10 @@ const toDoQuestions = [
             {
                 name: "Add Role",
                 value: "addRole",
+            },
+            {
+                name: "Update Employee Role",
+                value: "updateRole",
             },
         ],
     },

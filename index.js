@@ -1,7 +1,7 @@
 const connection = require('./config/connection');
 const inquirer = require('inquirer');
 const [toDoQuestions] = require('./src/questions');
-const [viewAllEmployees, addEmployee] = require('./lib/employee');
+const [viewAllEmployees, addEmployee, updateEmployee] = require('./lib/employee');
 const [viewAllDepartments, addDepartment] = require('./lib/department');
 const [viewAllRoles, addRole] = require('./lib/role');
 
@@ -28,7 +28,6 @@ const updateLists = async () => {
 const askQuestions = async () => {
     await updateLists()
     .then(async () => {
-        // console.log(employeesList);
         while (true) {
             var toDo = await inquirer.prompt(toDoQuestions)
             .then(async answers => {
@@ -41,7 +40,7 @@ const askQuestions = async () => {
                 else if (answers["to-do"] === "viewAllRoles") {
                     return await viewAllRoles();
                 }
-                else if (answers["to-do"] === "addEmployees") {
+                else if (answers["to-do"] === "addEmployee") {
                     let rolNameVal = []
                     for (var i = 0; i <rolesList.length; i++) {
                         rolNameVal.push({
@@ -52,7 +51,7 @@ const askQuestions = async () => {
                     let empNameVal = []
                     for (var i = 0; i <employeesList.length; i++) {
                         empNameVal.push({
-                            name: employeesList[i].first_name + " " + employeesList[i].first_name,
+                            name: employeesList[i].first_name + " " + employeesList[i].last_name,
                             value: employeesList[i].id
                         })
                     }
@@ -65,36 +64,73 @@ const askQuestions = async () => {
                             {
                                 type: 'input',
                                 name: 'first-name',
-                                message: "Employees First Name?",
+                                message: "Employee's First Name?",
                             },
                             {
                                 type: 'input',
                                 name: 'last-name',
-                                message: "Employees Last Name?",
+                                message: "Employee's Last Name?",
                             },
                             {
                                 type: 'list',
                                 name: 'role-id',
-                                message: "Employees Title?",
+                                message: "Employee's Title?",
                                 choices: rolNameVal,
                             },
                             {
                                 type: 'list',
                                 name: 'manager-id',
-                                message: "Employees Title?",
+                                message: "Employee's Manager?",
                                 choices: empNameVal,
                             },
                         ]
                     )
                     .then(async answers => {
-                        console.log(answers);
                         return await addEmployee(answers['first-name'], answers['last-name'], answers['role-id'], answers['manager-id'])
                         .then(() => {
                             updateLists()
                         });
                     })
                 }
-                if (answers["to-do"] === "addDepartment") {
+                else if (answers["to-do"] === "updateRole") {
+                    let rolNameVal = []
+                    for (var i = 0; i <rolesList.length; i++) {
+                        rolNameVal.push({
+                            name: rolesList[i].title,
+                            value: rolesList[i].id
+                        })
+                    }
+                    let empNameVal = []
+                    for (var i = 0; i <employeesList.length; i++) {
+                        empNameVal.push({
+                            name: employeesList[i].first_name + " " + employeesList[i].last_name,
+                            value: employeesList[i].id
+                        })
+                    }
+                    await inquirer.prompt(
+                        [
+                            {
+                                type: 'list',
+                                name: 'employee-id',
+                                message: "Employee's Name?",
+                                choices: empNameVal,
+                            },
+                            {
+                                type: 'list',
+                                name: 'role-id',
+                                message: "Employee's Role?",
+                                choices: rolNameVal,
+                            },
+                        ]
+                    )
+                    .then(async answers => {
+                        return await updateEmployee(answers['employee-id'], answers['role-id'])
+                        .then(() => {
+                            updateLists()
+                        });
+                    })
+                }
+                else if (answers["to-do"] === "addDepartment") {
                     await inquirer.prompt(
                         [
                             {
@@ -105,7 +141,6 @@ const askQuestions = async () => {
                         ]
                     )
                     .then(async answers => {
-                        console.log(answers);
                         return await addDepartment(answers['department-name'])
                         .then(() => {
                             updateLists()
@@ -141,14 +176,12 @@ const askQuestions = async () => {
                         ]
                     )
                     .then(async answers => {
-                        console.log(answers);
                         return await addRole(answers['role-title'], answers['role-salary'], answers['department-id'])
                         .then(() => {
                             updateLists()
                         });
                     })
                 }
-                // console.log(answers);
             })
         }
     });
